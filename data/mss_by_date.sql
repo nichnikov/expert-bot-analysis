@@ -1,4 +1,4 @@
 select * from online_helper__chats.messages m
-WHERE  m.created >= '2025-1-1'::date and text not like '%AUTOTEST%'
-limit 25000
+LIMIT 100
+/*WHERE  m.created >= '2025-2-24'::date AND m.created =< '2025-3-2'::date  AND m. not like '%AUTOTEST%'
 
