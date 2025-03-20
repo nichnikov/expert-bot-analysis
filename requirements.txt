@@ -1,1 +1,8 @@
 pandas
+pyarrow
+openpyxl
+dotenv
+openai
+pydantic-settings
+matplotlib
+PyQt5
