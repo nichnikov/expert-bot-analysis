@@ -6,3 +6,4 @@ openai
 pydantic-settings
 matplotlib
 PyQt5
+langchain
