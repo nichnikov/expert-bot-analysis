@@ -24,18 +24,11 @@ logger = logging.getLogger(__name__)
 
 class Retriever:
     def __init__(self, settings: Settings, parameters: Parameters):
-        # self.lemmitizer = TextsLemmatizer()
         self.es = ElasticClient(settings, parameters)
-        # self.dense = DenseRetriever(parameters)
         self.parameters = parameters
 
-    async def es_search(self, chat_id: str):
-        #lm_query = " ".join(self.lemmitizer([query])[0])
-        #match = MatchPhrase(self.parameters.es_first_field, sys)
-        #match_phrase = Match(self.parameters.es_second_field, lm_query)
-        #bool_query = Bool([match_phrase, match])
-        # es_docs = await self.es.search_query(self.parameters.es_index, bool_query.to_dict())
-        es_query = {"match_phrase": {self.parameters.es_first_field: chat_id}}
+    async def es_search(self, es_index, es_query):
+        # es_query = {"match_phrase": {self.parameters.es_first_field: chat_id}}
         '''
         es_query = {"bool": {"must": 
                              [{"match_phrase": {self.parameters.es_first_field: sys}},
@@ -46,8 +39,7 @@ class Retriever:
         es_query = {"multi_match" : {"query": lm_query,
                                      "fields": [self.parameters.es_second_field, self.parameters.es_third_field+"^2"]}
                                                }'''
-        print("es_query:", es_query)
-        es_docs = await self.es.search_query(self.parameters.es_index, es_query)
+        es_docs = await self.es.search_query(es_index, es_query)
         
 
         # await self.es.close()
