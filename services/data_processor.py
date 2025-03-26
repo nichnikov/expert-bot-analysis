@@ -58,23 +58,30 @@ class ChatDataProcessor:
         self.data_df["created"] = pd.to_datetime(self.data_df["created"])
         logging.info("Колонки данных очищены и обновлены.")
 
-    def classify_authors(self):
-        """Классифицирует авторов сообщений."""
-        user_messages = [
-            "UserMessage", "UserNewsPositiveReactionMessage", 
-            "UserMobileMessage", "UserFileMessage"
-        ]
-        operator_messages = [
-            "AutoGoodbyeMessage", "AutoHello2Message",  "AutoHelloMessage", 
-            "AutoHelloNewsMessage", "AutoHelloOfflineMessage", "AutoRateMessage", 
-            "HotlineNotificationMessage", "MLRoboChatMessage", "NewsAutoMessage", 
-            "OperatorMessage"
-        ]
+    def classify_authors(self, aggregation=True):
+        
+        if aggregation:
+            
+            """Классифицирует авторов сообщений."""
+            user_messages = [
+                "UserMessage", "UserNewsPositiveReactionMessage", 
+                "UserMobileMessage", "UserFileMessage"
+            ]
+            operator_messages = [
+                "AutoGoodbyeMessage", "AutoHello2Message",  "AutoHelloMessage", 
+                "AutoHelloNewsMessage", "AutoHelloOfflineMessage", "AutoRateMessage", 
+                "HotlineNotificationMessage", "MLRoboChatMessage", "NewsAutoMessage", 
+                "OperatorMessage"
+            ]
 
-        self.data_df["Autor"] = "Нет"
-        self.data_df["Autor"][self.data_df["discriminator"].isin(user_messages)] = "Пользователь"
-        self.data_df["Autor"][self.data_df["discriminator"].isin(operator_messages)] = "Оператор"
-        logging.info("Авторы сообщений классифицированы.")
+            self.data_df["Autor"] = "Нет"
+            self.data_df["Autor"][self.data_df["discriminator"].isin(user_messages)] = "Пользователь"
+            self.data_df["Autor"][self.data_df["discriminator"].isin(operator_messages)] = "Оператор"
+            logging.info("Авторы сообщений классифицированы.")
+        
+        else:
+            self.data_df.rename(columns={"discriminator": "Autor"}, inplace=True)
+        
 
     def group_messages(self):
         """Группирует сообщения по chat_id."""
@@ -113,9 +120,9 @@ class ChatDataProcessor:
                 json.dump(temp_dict, f, ensure_ascii=False)
                 logging.info(f"Группированные данные сохранены в {out_path_json}.")
     
-    def pipline(self, what="save", **kwads):
+    def pipline(self, **kwads):
         self.load_data()
-        self.classify_authors()
+        self.classify_authors(aggregation=kwads.get("aggregation"))
         self.group_messages()
 
 

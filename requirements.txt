@@ -7,3 +7,5 @@ pydantic-settings
 matplotlib
 PyQt5
 langchain
+elasticsearch
+aiohttp
