@@ -10,7 +10,7 @@ from core.data_types import Settings, Parameters, PromtsChain
 from services.retriever import Retriever
 from llm.ai_agent import OpenAIClient, AIAgent
 # from services.answer_agent import AnswerAgent
-# from services.validate_agent import AnswerAgent
+from services.validate_agent import AnswerAgent
 from core.config import logger
 
 mode = "test"
@@ -31,4 +31,4 @@ if mode == "test":
 retriever = Retriever(settings, parameters)
 openai_client = OpenAIClient(api_key=settings.openai_api_key)
 ai_client = AIAgent(ai_client=openai_client, logger=logger)
-# answer_agent = AnswerAgent(parameters, ai_client, promts)
+answer_agent = AnswerAgent(parameters, ai_client, promts)
