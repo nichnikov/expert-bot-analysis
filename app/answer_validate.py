@@ -25,9 +25,9 @@ validate_chats = []
 loop = asyncio.get_event_loop()
 
 jcc_sim_coeff = 0.8
-for d in robo_chats_dicts[:1500]:
+for d in robo_chats_dicts:
     if d["Autor"] == "MLRoboChatMessage":
-        temp_d = {"chat_id": d["chat_id"], "help": d["Help"], "mod_doc": []}
+        temp_d = {"chat_id": d["chat_id"], "help": d["Help"], "mod_doc": [], "title": []}
         if jaccard_similarity(d["Phrase"], "Рады приветствовать Вас на нашем сайте!") > jcc_sim_coeff:
             temp_d["Type"] = "Приветствие"
             temp_d["Algorithm"] = "Jaccard"
@@ -57,38 +57,24 @@ for d in robo_chats_dicts[:1500]:
 
         validate_chats.append(temp_d)
 
-    '''
-    print(d["Autor"])
-    print(d)
-    # print(d["Phrase"])
-    es_query1 = {"match_phrase": {parameters.es_first_field: d["chat_id"]}}
-    es_res = loop.run_until_complete(retriever.es_search(parameters.es_index, es_query1))
-    for es_d in es_res:
-        answer = es_d["response"]["templateText"]
-        # print("algorithm:", es_d["response"]["algorithm"])
-        # print("templateText:", es_d["response"]["templateText"])
-        # print("etalon_text:", es_d["response"]["etalon_text"])
-        
-        docs_prm =  re.findall(r"\d{2,}", answer)
-        if docs_prm:
-            mod_id = docs_prm[0]
-            doc_id = docs_prm[1]
-            # print("mod_id:", mod_id)
-            # print("doc_id:", doc_id)
-
-            es_query2 = {"bool": {"must": [{"match_phrase": {"mod_id": mod_id}},
-                                           {"match_phrase": {"doc_id": doc_id}}]}}
-
-            es_res2 = loop.run_until_complete(retriever.es_search("ch_documents", es_query2))
-
-            for d in es_res2:
-                pass
-                # print("title:", d["title"])
-                # print("text:\n", d["text"])
-            # print("es_res2:", es_res2)
-    # Закрытие цикла событий, если он был создан вручную
-    if loop.is_running():
-        loop.close()'''
+for d in validate_chats:
+    if d["Type"] == "Вопрос":
+        for m_d in d["mod_doc"]:
+            mod_id = m_d[0]
+            doc_id = m_d[1]
+            es_query = {"bool": {"must": [{"match_phrase": {"mod_id": mod_id}},
+                                        {"match_phrase": {"doc_id": doc_id}}]}}
+            es_res = loop.run_until_complete(retriever.es_search("ch_documents", es_query))
+            for e_d in es_res:
+                d["title"].append(e_d["title"])
+                    # print("title:", e_d["title"])
+                    # print("text:\n", e_d["text"])
+    
+    
+    
+# Закрытие цикла событий, если он был создан вручную
+if loop.is_running():
+    loop.close()
 
 validate_chats_df = pd.DataFrame(validate_chats)
 print(validate_chats_df)
